@@ -45,11 +45,16 @@ abstract class BaseDatabase implements DatabaseInterface {
       })
   }
 
+  getId(array: []) {
+    if (!array.length) return 1
+    return Math.max(...array.map((i: List) => i.id)) + 1
+  }
+
   addList() {
     const lists = this.get('lists')
 
     const newList = {
-      id: Math.max(...lists.map((i: List) => i.id)) + 1,
+      id: this.getId(lists),
       ts: new Date().getTime(),
     }
     this.set('lists', [...lists, newList])
@@ -79,9 +84,11 @@ abstract class BaseDatabase implements DatabaseInterface {
   addItem(item: Omit<Item, 'id'>) {
     const items = this.get('items')
 
+    item.text = item.text.trim()
+
     const newItem = {
       ...item,
-      id: Math.max(...items.map((i: Item) => i.id)) + 1,
+      id: this.getId(items),
     }
     items.push(newItem)
     this.set('items', items)
@@ -135,7 +142,9 @@ export class InMemoryDatabase extends BaseDatabase {
 export class LocalStorageDatabase extends BaseDatabase {
   get(key: string) {
     if (typeof localStorage === 'undefined') return []
-    return JSON.parse(localStorage.getItem(key))
+    const value = localStorage.getItem(key)
+    if (!value) return []
+    return JSON.parse(value)
   }
 
   set(key: string, value: any) {
