@@ -1,42 +1,39 @@
+import { DatabaseInterface } from './database.service'
+
 export class Suggestion {
   private now: number
-  constructor(private DB: any, now = 0) {
+  constructor(private DB: DatabaseInterface, now = 0) {
     this.now = now || new Date().getTime()
   }
 
   lists() {
-    return this.DB.List.all().filter((list) => {
+    return this.DB.getLists().filter((list) => {
       return this.now - list.ts < 60 * 60 * 24 * 31 * 6 // ~6 months
     })
   }
 
   items() {
-    const listIds = this.lists().map((list) => list.id)
-
-    return this.DB.Item.all()
-      .filter((item) => listIds.includes(item.list_id))
-      .map((item) => {
-        item.list = this.lists().find((list) => list.id === item.list_id)
-        return item
-      })
+    return this.lists()
+      .map((list) => this.DB.getItemsForList(list.id))
+      .flat()
   }
 
   groupedItems() {
     return this.items().reduce((sum, item) => {
-      if (!sum.find((current) => current.name === item.name)) {
+      if (!sum.find((current) => current.text === item.text)) {
         sum.push({
-          name: item.name,
+          text: item.text,
           entries: [],
         })
       }
 
-      sum.find((current) => current.name === item.name).entries.push(item)
+      sum.find((current) => current.text === item.text).entries.push(item)
       return sum
     }, [])
   }
 
-  itemNames() {
-    return this.groupedItems().map((item) => item.name)
+  itemTexts() {
+    return this.groupedItems().map((item) => item.text)
   }
 
   recent() {
@@ -73,7 +70,7 @@ export class Suggestion {
       })
   }
 
-  recentNames() {
-    return this.recent().map((item) => item.name)
+  recentTexts() {
+    return this.recent().map((item) => item.text)
   }
 }
