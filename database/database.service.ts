@@ -85,10 +85,13 @@ abstract class BaseDatabase implements DatabaseInterface {
     const items = this.get('items')
 
     item.text = item.text.trim()
+    const ts = new Date().getTime()
 
     const newItem = {
       ...item,
       id: this.getId(items),
+      updatedAt: ts,
+      createdAt: ts,
     }
     items.push(newItem)
     this.set('items', items)
@@ -111,6 +114,7 @@ abstract class BaseDatabase implements DatabaseInterface {
     const newItem = {
       ...oldItem,
       ...item,
+      updatedAt: new Date().getTime(),
     }
     const items = this.get('items').map((i: Item) => {
       if (i.id === newItem.id) {
