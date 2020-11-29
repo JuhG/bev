@@ -52,6 +52,7 @@ const ListPage = () => {
   const idNumber = parseInt(String(id), 10)
 
   const { data, mutate } = useSWR(['getItemsForList', idNumber], lsFetcher)
+  const texts = data.map((item: Item) => item.text)
 
   return (
     <div>
@@ -63,12 +64,30 @@ const ListPage = () => {
       <div className="mx-auto max-w-sm p-4">
         <nav className="flex items-baseline justify-between">
           <Link href="/">
-            <a className="w-14 p-1">&#xab; back</a>
+            <a className="w-16 p-1">&#xab; back</a>
           </Link>
           <h1 className="text-xl font-medium mb-4">List {id}</h1>
-          <p className="w-14"></p>
-        </nav>
+          <button
+            onClick={() => {
+              const list = DbService.addList()
 
+              // move all leftover items to new list
+              data
+                .filter((item: Item) => !item.checked)
+                .forEach((item: Item) => {
+                  DbService.updateItem({
+                    id: item.id,
+                    list_id: list.id,
+                  })
+                })
+
+              router.push('/list/' + list.id)
+            }}
+            className="w-16 p-1 text-right"
+          >
+            move &#xbb;
+          </button>
+        </nav>
         <ul className="divide-y divide-pink-500">
           {!data
             ? null
@@ -82,7 +101,6 @@ const ListPage = () => {
                 />
               ))}
         </ul>
-
         <form
           onSubmit={(e) => {
             e.preventDefault()
