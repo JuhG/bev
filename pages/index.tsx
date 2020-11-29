@@ -3,12 +3,14 @@ import useSWR from 'swr'
 import { List, LocalStorageDatabase } from '../database/database.service'
 import { useRouter } from 'next/router'
 
+const DbService = new LocalStorageDatabase()
+
 const Row = ({ id, ts, open = 0, max = 0 }) => {
   return (
     <li className="flex items-center leading-none">
       <Link href={'/list/' + id}>
         <a
-          className={`py-3 ml-4 flex-1 flex justify-between ${
+          className={`py-4 ml-4 flex-1 flex justify-between ${
             open ? '' : 'text-gray-300'
           }`}
         >
@@ -23,7 +25,6 @@ const Row = ({ id, ts, open = 0, max = 0 }) => {
 }
 
 const Home = () => {
-  const DbService = new LocalStorageDatabase()
   const lsFetcher = (name: string, ...args: any[]) => DbService[name](...args)
 
   const router = useRouter()
@@ -38,7 +39,9 @@ const Home = () => {
       <ul className="divide-y divide-pink-500">
         {!data
           ? null
-          : data.map((list: List) => <Row key={list.id} {...list} />)}
+          : data
+              .filter((list: List) => list.open > 0)
+              .map((list: List) => <Row key={list.id} {...list} />)}
       </ul>
 
       <button
@@ -47,10 +50,18 @@ const Home = () => {
           const list = DbService.addList()
           router.push('/list/' + list.id)
         }}
-        className="w-full rounded p-1 bg-pink-100 border-2 border-pink-300"
+        className="w-full rounded my-4 p-1 bg-pink-100 border-2 border-pink-300"
       >
         Add new list
       </button>
+
+      <ul className="divide-y divide-pink-500">
+        {!data
+          ? null
+          : data
+              .filter((list: List) => list.open === 0)
+              .map((list: List) => <Row key={list.id} {...list} />)}
+      </ul>
     </div>
   )
 }
