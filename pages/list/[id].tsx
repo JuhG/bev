@@ -104,17 +104,53 @@ const ListPage = () => {
             className="w-full mt-4 px-2 py-1 border-2 border-gray-300 rounded"
           />
         </form>
-
+        <h2 className="text-lg mt-4 pb-1 border-b border-pink-300">
+          Suggestions
+        </h2>
         <ul>
-          {suggest.recentTexts().map((item: Item) => {
-            return <li>{item.text}</li>
-          })}
+          {suggest
+            .itemTexts()
+            .filter((text: string) => !texts.includes(text))
+            .map((text: string) => (
+              <li key={text} className="my-2">
+                <button
+                  onClick={() => {
+                    DbService.addItem({
+                      text: text,
+                      list_id: idNumber,
+                    })
+                    mutate()
+                  }}
+                  className="p-2"
+                >
+                  + {text}
+                </button>
+              </li>
+            ))}
         </ul>
 
+        <hr />
+
         <ul>
-          {suggest.itemTexts().map((item: Item) => {
-            return <li>{item.text}</li>
-          })}
+          {suggest
+            .recentTexts()
+            .filter((text: string) => !texts.includes(text))
+            .map((text: string) => (
+              <li key={text} className="my-2">
+                <button
+                  onClick={() => {
+                    DbService.addItem({
+                      text: text,
+                      list_id: idNumber,
+                    })
+                    mutate()
+                  }}
+                  className="p-2"
+                >
+                  + {text}
+                </button>
+              </li>
+            ))}
         </ul>
       </div>
     </div>
