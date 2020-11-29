@@ -56,7 +56,7 @@ const ListPage = () => {
   const idNumber = parseInt(String(id), 10)
 
   const { data, mutate } = useSWR(['getItemsForList', idNumber], lsFetcher)
-  const texts = data.map((item: Item) => item.text)
+  const texts = data ? data.map((item: Item) => item.text) : []
 
   return (
     <div>
