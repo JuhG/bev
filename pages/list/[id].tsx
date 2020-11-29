@@ -34,6 +34,10 @@ const Row = ({ id, text, checked = false, mutate }) => {
       </label>
       <button
         onClick={() => {
+          if (!window.confirm('Are you sure?')) {
+            return
+          }
+
           DbService.removeItem(id)
           mutate()
         }}
@@ -69,6 +73,12 @@ const ListPage = () => {
           <h1 className="text-xl font-medium mb-4">List {id}</h1>
           <button
             onClick={() => {
+              if (data.filter((item: Item) => item.checked).length === 0) {
+                if (!window.confirm('Are you sure?')) {
+                  return
+                }
+              }
+
               const list = DbService.addList()
 
               // move all leftover items to new list
