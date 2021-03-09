@@ -1,4 +1,5 @@
 import { DatabaseInterface } from './database.service'
+import ms from 'ms'
 
 export class Suggestion {
   private now: number
@@ -8,7 +9,7 @@ export class Suggestion {
 
   lists() {
     return this.DB.getLists().filter((list) => {
-      return this.now - list.ts < 60 * 60 * 24 * 31 * 6 // ~6 months
+      return this.now - list.ts < ms('12 weeks')
     })
   }
 

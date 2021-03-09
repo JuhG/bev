@@ -135,27 +135,29 @@ const ListPage = () => {
         <h2 className="text-lg mt-4 pb-1 border-b border-pink-300">
           Suggestions
         </h2>
-        <ul>
-          {suggest
-            .itemTexts()
-            .filter((text: string) => !texts.includes(text))
-            .map((text: string) => (
-              <li key={text} className="my-2">
-                <button
-                  onClick={() => {
-                    DbService.addItem({
-                      text: text,
-                      list_id: idNumber,
-                    })
-                    mutate()
-                  }}
-                  className="p-2"
-                >
-                  + {text}
-                </button>
-              </li>
-            ))}
-        </ul>
+        {text && (
+          <ul>
+            {suggest
+              .itemTexts()
+              .filter((itemText: string) => itemText.includes(text))
+              .map((text: string) => (
+                <li key={text} className="my-2">
+                  <button
+                    onClick={() => {
+                      DbService.addItem({
+                        text: text,
+                        list_id: idNumber,
+                      })
+                      mutate()
+                    }}
+                    className="p-2"
+                  >
+                    + {text}
+                  </button>
+                </li>
+              ))}
+          </ul>
+        )}
 
         <hr />
 
